@@ -23,7 +23,9 @@ export class UsersRepository implements IUsersRepository {
     // }
 
     return this.repository.query(`
-      SELECT u.first_name, u.last_name, u.email, array_agg(g.title) AS games FROM users u
+      SELECT u.email, u.last_name, u.first_name,
+      json_agg(json_build_object('title', g.title)) AS games 
+      FROM users u
       JOIN users_games_games ugg
       ON u.id = ugg."usersId"
       JOIN games g
@@ -31,6 +33,7 @@ export class UsersRepository implements IUsersRepository {
       WHERE u.id = '${user_id}'
       GROUP BY 1, 2, 3
     `)
+
   }
 
   async findAllUsersOrderedByFirstName(): Promise<User[]> {
