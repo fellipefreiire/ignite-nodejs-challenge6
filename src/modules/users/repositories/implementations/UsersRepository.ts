@@ -15,13 +15,22 @@ export class UsersRepository implements IUsersRepository {
     user_id,
   }: IFindUserWithGamesDTO): Promise<User> {
     // Complete usando ORM
-    const user = await this.repository.findOne({ id: user_id })
+    // const user = await this.repository.findOne({ id: user_id })
+    // const user = await this.repository.findOne({ id: user_id }, { select:  })
 
-    if (!user) {
-      throw new Error
-    }
+    // if (!user) {
+    //   throw new Error
+    // }
 
-    return user
+    return this.repository.query(`
+      SELECT u.first_name, u.last_name, u.email, array_agg(g.title) AS games FROM users u
+      JOIN users_games_games ugg
+      ON u.id = ugg."usersId"
+      JOIN games g
+      ON ugg."gamesId" = g.id
+      WHERE u.id = '${user_id}'
+      GROUP BY 1, 2, 3
+    `)
   }
 
   async findAllUsersOrderedByFirstName(): Promise<User[]> {
