@@ -14,26 +14,9 @@ export class UsersRepository implements IUsersRepository {
   async findUserWithGamesById({
     user_id,
   }: IFindUserWithGamesDTO): Promise<User> {
-    // Complete usando ORM
-    // const user = await this.repository.findOne({ id: user_id })
-    // const user = await this.repository.findOne({ id: user_id }, { select:  })
+    const user = await this.repository.find({ relations: ['games'], where: { id: user_id } })
 
-    // if (!user) {
-    //   throw new Error
-    // }
-
-    return this.repository.query(`
-      SELECT u.email, u.last_name, u.first_name,
-      json_agg(json_build_object('title', g.title)) AS games 
-      FROM users u
-      JOIN users_games_games ugg
-      ON u.id = ugg."usersId"
-      JOIN games g
-      ON ugg."gamesId" = g.id
-      WHERE u.id = '${user_id}'
-      GROUP BY 1, 2, 3
-    `)
-
+    return user[0];
   }
 
   async findAllUsersOrderedByFirstName(): Promise<User[]> {

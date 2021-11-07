@@ -35,6 +35,13 @@ export class GamesRepository implements IGamesRepository {
     //   .from('users')
     //   .leftJoin('users_games_games')
 
+    //@ts-ignore
+    return this.repository
+      .createQueryBuilder('games')
+      .leftJoinAndSelect('games.users', 'users')
+      .where(`games.id = '${id}'`)
+      .getMany()
+
     return this.repository.query(`
       SELECT u.* FROM users u
       JOIN users_games_games ugg
